@@ -19,7 +19,6 @@ public class Trains extends Edge {
 	 * 在不同问题中权值定义不同，这里暂时设为乘车时间（到站时间-发站时间），以分钟计，具体运算的时候再说 权值使用父类的变量w
 	 */
 	private int w0;
-
 	static Schedule[] readSchedules(String path) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		schedules = new Schedule[Integer.parseInt(br.readLine())+1];
@@ -118,7 +117,7 @@ public class Trains extends Edge {
 
 	public Trains(int depStId, int arrStId, int trainCodeId, String depStName, String arrStName, int depTime,
 			int arrTime, int arrDay) {
-		super(depStId, arrStId, -1);
+		super(depStId, arrStId, arrTime-depTime+1440*arrDay);
 		this.depStId = depStId;
 		this.arrStId = arrStId;
 		this.trainCodeId = trainCodeId;

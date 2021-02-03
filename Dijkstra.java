@@ -87,6 +87,13 @@ class Vertex{
 		this.id=id;
 	}
 	Edge E=null;
+	private Edge E0;
+	void saveHeadNode() {
+		E0=E;
+	}
+	void restoreHeadNode() {
+		E=E0;
+	}
 }
 class Edge{
 	int v1,v2,w;
