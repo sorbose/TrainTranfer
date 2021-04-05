@@ -30,7 +30,7 @@ public class Main {
 			int Nv = sc.nextInt();
 			int Ne = sc.nextInt();
 			int s = sc.nextInt();
-			Graph g = new Graph(Nv);
+			Graph g = new Graph();
 			for (int i = 0; i < Nv; i++) {
 				g.v[i] = new Vertex(i);
 			}

@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Trains extends Edge {
+public class Trains extends Edge implements Cloneable {
 	static Schedule[] schedules;
 	int depStId;
 	int arrStId;
@@ -19,11 +19,12 @@ public class Trains extends Edge {
 	 * 在不同问题中权值定义不同，这里暂时设为乘车时间（到站时间-发站时间），以分钟计，具体运算的时候再说 权值使用父类的变量w
 	 */
 	private int w0;
+
 	static Schedule[] readSchedules(String path) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(path));
-		schedules = new Schedule[Integer.parseInt(br.readLine())+1];
-		/*id从1开始，所以数组长度+1，0无意义*/
-		schedules[0]=new Schedule(-1, -1, -1, "*无意义", "无意义*", null);
+		schedules = new Schedule[Integer.parseInt(br.readLine()) + 1];
+		/* id从1开始，所以数组长度+1，0无意义 */
+		schedules[0] = new Schedule(-1, -1, -1, "*无意义", "无意义*", null);
 		String idStr;
 		int id;
 		int lineCnt;
@@ -64,9 +65,9 @@ public class Trains extends Edge {
 	}
 
 	static void addTrains(RailNet railnet) {
-		for (int _i=0;_i<schedules.length;_i++) {
-			Schedule sch=schedules[_i];
-			if (sch==null||sch.lines == null)
+		for (int _i = 0; _i < schedules.length; _i++) {
+			Schedule sch = schedules[_i];
+			if (sch == null || sch.lines == null)
 				continue;
 			for (int i = 0; i < sch.lines.length; i++) {
 				String depStName = sch.lines[i].station_name;
@@ -93,31 +94,83 @@ public class Trains extends Edge {
 					int trainCodeId = sch.trainCodeId;
 					Trains newT = new Trains(depStId, arrStId, trainCodeId, depStName, arrStName, depTime, arrTime,
 							arrDay);
-					int depDay=sch.lines[i].arrive_day_diff;
-					if(sch.lines[i].arrive_time>sch.lines[i].start_time)depDay++;
-					newT.w=arrTime-depTime+(arrDay-depDay)*1440;
-					newT.w0=newT.w;
-					
+					int depDay = sch.lines[i].arrive_day_diff;
+					if (sch.lines[i].arrive_time > sch.lines[i].start_time)
+						depDay++;
+					newT.w = arrTime - depTime + (arrDay - depDay) * 1440;
+					newT.w0 = newT.w;
+
+//					System.out.println(newT.depStName+"  "+newT.arrStName);
 					railnet.addEdge(newT);
 				}
 			}
 		}
 	}
-	
-	public static void restoreWeight(RailNet railnet) {
-		for(int i=0;i<railnet.v.length;i++) {
-			if(railnet.v[i]==null||railnet.v[i].E==null)continue;
-			Trains t=(Trains) railnet.v[i].E;
-			while(t!=null) {
-				t.w=t.w0;
-				t=(Trains) t.nextEdge;
+
+	static String getATrainBasicDescInf(int schedulesIndex, String startStName, String arrStName) {
+		Schedule sch = schedules[schedulesIndex];
+		String res;
+		String stTrFrom = sch.originStName, stTrTo = sch.terminalStName;
+		boolean hasSelV1 = false;
+		int startT = -1, arriveT = -2;
+		int stNoV1 = 0, stNoV2 = 0;
+		int dayV1 = -1, dayV2 = -2;
+		String checi = null;
+		for (int ii = 0; ii < sch.lines.length; ii++) {
+			if (sch.lines[ii].station_name.equals(startStName) && hasSelV1 == false) {
+				hasSelV1 = true;/* 考虑环线车站在时刻表中出现两次的问题，当作为发站时，以较早出现的为准 */
+				startT = sch.lines[ii].start_time;
+				checi = sch.lines[ii].station_train_code;
+				stNoV1 = sch.lines[ii].station_no;
+				dayV1 = sch.lines[ii].arrive_day_diff;
+				if (startT < sch.lines[ii].arrive_time)
+					dayV1++;
+			}
+			if (sch.lines[ii].station_name.equals(arrStName)) {
+				arriveT = sch.lines[ii].arrive_time;
+				stNoV2 = sch.lines[ii].station_no;
+				dayV2 = sch.lines[ii].arrive_day_diff;
 			}
 		}
+		res = startStName + " -> " + arrStName + " " + checi + "(始:" + stTrFrom + ",终:" + stTrTo + ") "
+				+ Trains.intTimeToStr(startT).replace("时", ":").replace("分", "") + "~"
+				+ Trains.intTimeToStr(arriveT).replace("时", ":").replace("分", "");
+		if (dayV2 - dayV1 > 0) {
+			res += "(+" + (dayV2 - dayV1) + ") ";
+		}
+		res += "(共" + (stNoV2 - stNoV1) + "站)";
+		return res;
+	}
+
+	public static void restoreWeight(RailNet railnet) {
+		for (int i = 0; i < railnet.v.length; i++) {
+			if (railnet.v[i] == null || railnet.v[i].E == null)
+				continue;
+			Trains t = (Trains) railnet.v[i].E;
+			while (t != null) {
+				t.w = t.w0;
+				t = (Trains) t.nextEdge;
+			}
+		}
+	}
+	
+	
+
+	@Override
+	public Object clone(){
+		// TODO 自动生成的方法存根
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public Trains(int depStId, int arrStId, int trainCodeId, String depStName, String arrStName, int depTime,
 			int arrTime, int arrDay) {
-		super(depStId, arrStId, arrTime-depTime+1440*arrDay);
+		super(depStId, arrStId, arrTime - depTime + 1440 * arrDay);
 		this.depStId = depStId;
 		this.arrStId = arrStId;
 		this.trainCodeId = trainCodeId;
@@ -129,10 +182,9 @@ public class Trains extends Edge {
 	}
 
 	public Trains(int weight) {
-		this(-1,-2,-3,"*no","no*",-4,-5,-6);
-		super.w=weight;
+		this(-1, -2, -3, "*no", "no*", -4, -5, -6);
+		super.w = weight;
 	}
-
 
 	public static int strTimeToInt(String time, int day) {
 		String[] s = time.replace("：", ":").split(":");
@@ -144,16 +196,18 @@ public class Trains extends Edge {
 	}
 
 	public static String intTimeToStr(int time) {
-		/*将时间转换成h时m分的格式*/
-		int hr=time/60;
-		time%=60;
-		String res="";
-		if(hr<10) res+="0";
-		res+=hr;
-		res+=" 时";
-		if(time<10) res+="0";
-		res+=time;
-		res+=" 分";
+		/* 将时间转换成h时m分的格式 */
+		int hr = time / 60;
+		time %= 60;
+		String res = "";
+		if (hr < 10)
+			res += "0";
+		res += hr;
+		res += " 时";
+		if (time < 10)
+			res += "0";
+		res += time;
+		res += " 分";
 		return res;
 
 	}

@@ -32,10 +32,10 @@ public class Inquirer {
 			DijkstraForRail dijk = new DijkstraForRail();
 			Trains.restoreWeight(railNet);
 			railNet.avoidStations(stNameToAvoid);
-			dijk.fastestArrival(railNet, depV, depTime, sameStationInterval, diffStationInterval,filterTrainCodeType(trainCodeType));
+			dijk.fastestArrival(railNet, depV, depTime, sameStationInterval, diffStationInterval,filterTrainCodeType(trainCodeType),false,false,arrV);
 
 			System.out.println("方案1：最快到达");
-			String[] pathDescStr=Inquirer.getPathDesc(dijk.parTrainId, dijk.parent, arrV);
+			String[] pathDescStr=Inquirer.getPathDesc(dijk.parTrainId, dijk.parent, arrV,false);
 			for(int ii=0;ii<pathDescStr.length;ii++) {
 				System.out.println(pathDescStr[ii]);
 			}
@@ -56,61 +56,41 @@ public class Inquirer {
 		}
 		sc.close();
 	}
-	static String[] getPathDesc(int[] parTrainId,int[] parent,int arrV) {
-		if(parent[arrV]==arrV) {
+	static String[] getPathDesc(int[] nextTrainId,int[] nextVArr,int firstVId,boolean isInverse) {
+		if(nextVArr[firstVId]==firstVId) {
 			String[] s=new String[1];
 			s[0]="不连通！";
 			return s;
 		}
 		String[] s=new String[500];
 		int cnt=0;
-		for(int i=arrV;parent[i]!=i;i=parent[i]) {
-			int v2=i;
-			int v1=parent[i];
+		for(int i=firstVId;nextVArr[i]!=i;i=nextVArr[i]) {
+			int v1,v2;
+			if(isInverse) {v1=i;v2=nextVArr[i];}
+			else {v2=i;v1=nextVArr[i];}
 			String n2=ReadStations.stationsArr[v2].name;
 			String n1=ReadStations.stationsArr[v1].name;
-			int trainId=parTrainId[i];
-			int startT=-1,arriveT=-2;
-			int stNoV1=0,stNoV2=0;
-			int dayV1=-1,dayV2=-2;
-			String checi=null;
+			int trainId=nextTrainId[i];
+
 			if(trainId==-555) {
 				/*表示同城跨站换乘的专用trainID*/
 				s[cnt]=n1+" 站 --市内交通--> "+n2+" 站";
 				cnt++;
 				continue;
 			}
-			Schedule sch=Trains.schedules[trainId];
-			String stTrFrom=sch.originStName,stTrTo=sch.terminalStName;
-			for(int ii=0;ii<sch.lines.length;ii++) {
-				if(sch.lines[ii].station_name.equals(n1)) {
-					startT=sch.lines[ii].start_time;
-					checi=sch.lines[ii].station_train_code;
-					stNoV1=sch.lines[ii].station_no;
-					dayV1=sch.lines[ii].arrive_day_diff;
-					if(startT<sch.lines[ii].arrive_time)dayV1++;
-				}
-				if(sch.lines[ii].station_name.equals(n2)) {
-					arriveT=sch.lines[ii].arrive_time;
-					stNoV2=sch.lines[ii].station_no;
-					dayV2=sch.lines[ii].arrive_day_diff;
-				}
-			}
-			s[cnt]=n1+" -> "+n2+" "+checi+"(始:"+stTrFrom+",终:"+stTrTo+") "+
-			Trains.intTimeToStr(startT).replace("时", ":").replace("分", "")+"~"+
-			Trains.intTimeToStr(arriveT).replace("时", ":").replace("分", "");
-			if(dayV2-dayV1>0) {
-				s[cnt]+="(+"+(dayV2-dayV1)+") ";
-			}
-			s[cnt]+="(共"+(stNoV2-stNoV1)+"站)";
+//			System.out.println(n1+"--"+n2);
+			s[cnt]=Trains.getATrainBasicDescInf(trainId, n1, n2);
+//			System.out.println(s[cnt]);
 			cnt++;
 		}
 		String res[]=new String[cnt];
 		for(int i=0;i<cnt;i++) {
-			res[i]=s[cnt-1-i];
+			if(isInverse)res[i]=s[i];
+			else res[i]=s[cnt-1-i];
 		}
 		return res;
 	}
+	
 	private static String filterTrainCodeType(int trainCodeType) {
 		String res;/*res里储存的车次是不要的车次*/
 		if(trainCodeType==1) {
