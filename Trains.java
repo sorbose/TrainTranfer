@@ -197,6 +197,8 @@ public class Trains extends Edge implements Cloneable {
 
 	public static String intTimeToStr(int time) {
 		/* 将时间转换成h时m分的格式 */
+		if(time<0)return "";
+		if(time>0x1f3f3f3f)return "无结果";
 		int hr = time / 60;
 		time %= 60;
 		String res = "";

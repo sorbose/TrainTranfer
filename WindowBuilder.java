@@ -27,6 +27,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 
 public class WindowBuilder extends JFrame {
 
@@ -532,6 +535,7 @@ public class WindowBuilder extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 709, 556);
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(224, 255, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -550,7 +554,7 @@ public class WindowBuilder extends JFrame {
 		textField.setColumns(10);
 
 		textField_1 = new JTextField();
-		textField_1.setText("\u627F\u5FB7");
+		textField_1.setText("\u6E58\u6F6D");
 		textField_1.setFont(new Font("宋体", Font.PLAIN, 20));
 		textField_1.setColumns(10);
 		textField_1.setBounds(406, 72, 114, 38);
@@ -601,14 +605,14 @@ public class WindowBuilder extends JFrame {
 		contentPane.add(lblNewLabel_2_1);
 
 		textField_2 = new JTextField();
-		textField_2.setText("20");
+		textField_2.setText("40");
 		textField_2.setFont(new Font("宋体", Font.PLAIN, 16));
 		textField_2.setColumns(10);
 		textField_2.setBounds(447, 153, 73, 26);
 		contentPane.add(textField_2);
 
 		textField_3 = new JTextField();
-		textField_3.setText("60");
+		textField_3.setText("90");
 		textField_3.setFont(new Font("宋体", Font.PLAIN, 16));
 		textField_3.setColumns(10);
 		textField_3.setBounds(447, 186, 73, 26);
@@ -632,6 +636,18 @@ public class WindowBuilder extends JFrame {
 		contentPane.add(scrollPane);
 
 		JButton btnNewButton_1 = new JButton("\u67E5\u8BE2");
+		btnNewButton_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnNewButton_1.setBackground(new Color(175, 238, 238));
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnNewButton_1.setBackground(new Color(111, 222, 255));
+			}
+		});
+		btnNewButton_1.setBackground(new Color(175, 238, 238));
+		
 		btnNewButton_1.setFont(new Font("黑体", Font.BOLD, 20));
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -673,19 +689,21 @@ public class WindowBuilder extends JFrame {
 		contentPane.add(lblNewLabel_2_2);
 
 		textField_4 = new JTextField();
-		textField_4.setText("04:00");
+		textField_4.setText("07:00");
 		textField_4.setFont(new Font("宋体", Font.PLAIN, 16));
 		textField_4.setColumns(10);
 		textField_4.setBounds(447, 120, 73, 26);
 		contentPane.add(textField_4);
 
 		isFuzzyDepCheckBox = new JCheckBox("\u6A21\u7CCA\u53D1\u7AD9");
+		isFuzzyDepCheckBox.setBackground(new Color(224, 255, 255));
 		isFuzzyDepCheckBox.setSelected(true);
 		isFuzzyDepCheckBox.setFont(new Font("宋体", Font.PLAIN, 16));
 		isFuzzyDepCheckBox.setBounds(552, 41, 122, 33);
 		contentPane.add(isFuzzyDepCheckBox);
 
 		isFuzzyArrCheckBox = new JCheckBox("\u6A21\u7CCA\u5230\u7AD9");
+		isFuzzyArrCheckBox.setBackground(new Color(224, 255, 255));
 		isFuzzyArrCheckBox.setSelected(true);
 		isFuzzyArrCheckBox.setFont(new Font("宋体", Font.PLAIN, 16));
 		isFuzzyArrCheckBox.setBounds(552, 72, 122, 26);
@@ -694,6 +712,7 @@ public class WindowBuilder extends JFrame {
 		ButtonGroup bg_QueryTimeMode = new ButtonGroup();
 
 		isEarliestDepTimeRadioBtn = new JRadioButton("\u6307\u5B9A\u51FA\u53D1\u65F6\u95F4");
+		isEarliestDepTimeRadioBtn.setBackground(new Color(224, 255, 255));
 		isEarliestDepTimeRadioBtn.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -708,6 +727,7 @@ public class WindowBuilder extends JFrame {
 
 		ButtonGroup bg_QueryStaMode = new ButtonGroup();
 		isTransRadioBtn = new JRadioButton("\u6362\u4E58\u67E5\u8BE2");
+		isTransRadioBtn.setBackground(new Color(224, 255, 255));
 		isTransRadioBtn.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -727,6 +747,7 @@ public class WindowBuilder extends JFrame {
 		bg_QueryStaMode.add(isTransRadioBtn);
 
 		isS2SRadioBtn = new JRadioButton("\u7AD9\u7AD9\u67E5\u8BE2");
+		isS2SRadioBtn.setBackground(new Color(224, 255, 255));
 		isS2SRadioBtn.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -745,6 +766,7 @@ public class WindowBuilder extends JFrame {
 		bg_QueryStaMode.add(isS2SRadioBtn);
 
 		isStaRadioBtn = new JRadioButton("\u8F66\u7AD9\u67E5\u8BE2");
+		isStaRadioBtn.setBackground(new Color(224, 255, 255));
 		isStaRadioBtn.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -763,6 +785,7 @@ public class WindowBuilder extends JFrame {
 		bg_QueryStaMode.add(isStaRadioBtn);
 
 		isLastestArrTimeRadioBtn = new JRadioButton("\u6307\u5B9A\u5230\u8FBE\u65F6\u95F4");
+		isLastestArrTimeRadioBtn.setBackground(new Color(224, 255, 255));
 		isLastestArrTimeRadioBtn.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -774,7 +797,7 @@ public class WindowBuilder extends JFrame {
 		contentPane.add(isLastestArrTimeRadioBtn);
 		bg_QueryTimeMode.add(isLastestArrTimeRadioBtn);
 
-		JButton btnNewButton_1_1_1_1 = new JButton("\u968F\u673A\u6F2B\u6E38");
+		JButton btnNewButton_1_1_1_1 = new JButton("\u8BD5\u8BD5\u624B\u6C14");
 		btnNewButton_1_1_1_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (railnet == null) {

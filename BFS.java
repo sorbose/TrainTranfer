@@ -34,11 +34,11 @@ public class BFS {
 		int transCnt, resCnt = 0;
 		int currV;
 		int[] arrVs;
-		Heap<BFSStation> heap = new Heap<BFSStation>(5000, new BFSStation(-1, -1, null, -1)) {
+		Heap<BFSStation> heap = new Heap<BFSStation>(5000, new BFSStation(-1, -1, null, -1,-1)) {
 
 			@Override
 			public int compare(BFSStation a, BFSStation b) {
-
+				if(a.hadTransTimes!=b.hadTransTimes)return a.hadTransTimes>b.hadTransTimes?1:-1;
 				if (a.weight == b.weight)
 					return 0;
 				return a.weight > b.weight ? 1 : -1;
@@ -54,19 +54,22 @@ public class BFS {
 			arrVs=new int[1];
 			arrVs[0]=arrV;
 		}
+		if(isArrStation(startV, arrVs)) {
+			return;
+		}
 		int currTransCnt = 0;
 		while (!que.isEmpty()) {
 			currV = que.front().vId;
 			transCnt = que.front().transCnt;
+			//System.out.println(transCnt+" "+maxTransCnt+" "+resCnt+" "+maxResNum+" "+transCnt+" "+currTransCnt);
 			if (transCnt > maxTransCnt || (resCnt > maxResNum && transCnt > currTransCnt))
 				break;
 			currTransCnt = transCnt;
 
 			que.pop();
-
 			Trains tmpE = (Trains) g.v[currV].E;
 			while (tmpE != null) {
-				// System.out.println(que.size);
+//				System.out.println(que.size);
 //				System.out.println(tmpE.depStName+" "+tmpE.arrStName);
 //				if(transCnt > maxTransCnt&&resCnt>=maxResNum)break;
 				if (!RailNet.isTheTypeOfTrainSuitable(tmpE, avoidTrainType)) {
@@ -75,7 +78,10 @@ public class BFS {
 				}
 				int v2 = tmpE.v2;
 				if (isArrStation(v2,arrVs)) {
-					if (!heap.insert(new BFSStation(currV, tmpE.trainCodeId, this, v2)))
+//					System.out.println(currTransCnt);
+//					System.out.println(1);
+//					System.out.println(currV+" "+v2);
+					if (!heap.insert(new BFSStation(currV, tmpE.trainCodeId, this, v2,transCnt)))
 						break;
 					resCnt++;
 					tmpE = (Trains) tmpE.nextEdge;
@@ -149,10 +155,12 @@ class BFSStation {
 	int trainCodeId;
 	int weight;
 	int arrV;
+	int hadTransTimes;
 	BFSStation next = null;
 
-	public BFSStation(int vId, int trainCodeId, BFS bfs, int arrV) {
+	public BFSStation(int vId, int trainCodeId, BFS bfs, int arrV,int hadTransTimes) {
 		super();
+		this.hadTransTimes=hadTransTimes;
 		this.vId = vId;
 		this.trainCodeId = trainCodeId;
 		if (vId >= 0)
@@ -174,6 +182,7 @@ class BFSStation {
 		Pattern r = Pattern.compile(pattern);
 		int depTime, arrTime;
 		for (int i = arrV; bfs.parent[i] != i; i = bfs.parent[i]) {
+//			System.out.println(i);
 //			System.out.println(ReadStations.stationsArr[bfs.parent[i]].name);
 //			System.out.println(ReadStations.stationsArr[i].name);
 			aTrainBasicDescInf = Trains.getATrainBasicDescInf(bfs.parTrainId[i],
